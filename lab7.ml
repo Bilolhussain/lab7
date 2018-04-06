@@ -57,7 +57,11 @@ that accepts a shape_adt and returns a float representing the area of
 the shape.
 ....................................................................*)
 let area_adt (s : shape_adt) : float =
-  failwith "area_adt not implemented" ;;
+  match s with 
+  | Square (x, y) -> y *. y 
+  | Rect (x, y, z) -> y *. z
+  | Circle (x, y) -> 3.14 *. y *. y 
+;;
 
 (*....................................................................
 Exercise 1B: Write a function that, given a list of elements of type
@@ -65,7 +69,7 @@ shape_adt, returns a list of areas corresponding to every shape.
 ....................................................................*)
     
 let list_area_adt (lst : shape_adt list) : float list =
-  failwith "list_area_adt not implemented" ;;
+  List.map (area_adt x) lst ;; 
 
 
 (*====================================================================
@@ -191,23 +195,28 @@ object (this)
   val mutable height = h
 
   method area : float =
-    failwith "rect area method not implemented"
+    w *. h 
 
   method bounding_box : point * point =
-    failwith "rect bounding_box method not implemented"
+  let p = x, y in 
+    (p, ((x +. w), (y +. h)))
 
   method center : point =
-    failwith "rect center method not implemented"
+    let (bounding_box p) = x, y in 
+      let (x1, y1) = x in 
+      let (x2, y2) = y in 
+        ((x1 +. x2) /. 2 , (y1 +. y2) /. 2)
 
   (* Destructively update pos to translate the shape by the values
      given in t. *)
   method translate (t : point) : unit =
-    failwith "rect translate method not implemented"
+    let (p1, p2) = pos in let (t1, t2) = t in pos <- (p1 +. t1, p2 +. t2)
 
   (* Scale the width and height of a rectangle from the lower-
      left corner. *)
   method scale (k : float) : unit =
-    failwith "rect scale method not implemented"
+    width <- width *. k;
+    height <- height *. k 
 
 end ;;
 
@@ -222,21 +231,22 @@ object
   val mutable radius = r
 
   method area : float =
-    failwith "circle area method not implemented"
+    3.14 *. r *. r 
 
   method bounding_box : point * point =
-    failwith "circle bounding_box method not implemented"
+    let (c1, c2) = c in 
+      (c2 +. r, c2 -. r) 
 
   method center : point =
-    failwith "circle center method not implemented"
+    c ;; 
 
   (* Move the center of the circle by the values tx and ty. *)
   method translate ((tx, ty) : point) : unit =
-    failwith "circle translate method not implemented"
+    let (c1, c2) = c in center <- (c1 +. tx, c2 +. ty)
 
   (* Scale the radius by k without moving its center. *)
   method scale (k : float) : unit =
-    failwith "circle scale method not implemented"
+    radius <- radius *. k 
 
 end ;;
 
@@ -247,23 +257,31 @@ rect! In this case, we've left its implementation entirely up to you.
 
 class square (p : point) (s : float) : shape =
 object(this)
+
+  val mutable pos = p 
+  val mutable side = s 
+
   method area : float =
-    failwith "square area method not implemented"
+    s *. s
 
   method bounding_box : point * point =
-    failwith "square bounding_box method not implemented"
+    let (x, y) =  in 
+    (p, ((x +. s), (y +. s)))
 
   method center : point =
-    failwith "square center method not implemented"
+     let (x, y) = bounding_box p in 
+      let (x1, y1) = x in 
+      let (x2, y2) = y in 
+        ((x1 +. x2) /. 2 , (y1 +. y2) /. 2)
 
   (* Move the square by the values tx and ty. *)
   method translate ((tx, ty) : point) : unit =
-    failwith "square translate method not implemented"
+    let (p1, p2) = pos in pos <- (p1 +. tx, p2 +. ty)
 
   (* Scale with width and height of a rectangle from the lower-
      left corner. *)
   method scale (k : float) : unit =
-    failwith "square scale method not implemented"
+    side <- side *. k 
 
 end ;;
 
@@ -276,7 +294,7 @@ Exercise 2D: Create a function called area that accepts a shape object
 and returns a float of the area for that shape.
 ....................................................................*)
 let area (s : shape) : float =
-  failwith "area not implemented" ;;
+  s#area ;; 
 
 (*....................................................................
 Exercise 2E: Create a list of instantiated shapes called s_list.
@@ -468,4 +486,3 @@ to call based on the object, s, passed to it.
 Compare this to the area_adt function, which is not dynamic because
 the same code is run every time. Even though the match case may not be
 known, the branch is wholly contained within that static function. *)
-
